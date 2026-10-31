@@ -1063,6 +1063,8 @@ footer {
   max-width: 520px;
   max-height: 90vh;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(142, 142, 147, 0.25) transparent;
   background: var(--bg-surface-elevated) !important;
   backdrop-filter: blur(32px) saturate(200%) !important;
   -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
@@ -1070,6 +1072,14 @@ footer {
   box-shadow: 0 24px 70px -15px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--border-subtle) !important;
   border-radius: 24px !important;
   animation: macScaleIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.mac-window-card::-webkit-scrollbar {
+  width: 4px;
+}
+.mac-window-card::-webkit-scrollbar-thumb {
+  background: rgba(142, 142, 147, 0.25);
+  border-radius: 9999px;
 }
 
 /* 3. macOS Titlebar & Traffic Lights */

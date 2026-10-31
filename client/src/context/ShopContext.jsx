@@ -67,14 +67,14 @@ export const ShopProvider = ({ children }) => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // When user visits vibebazzar.vercel.app, render /login after 1.5s if not logged in
+  // When user visits the website (hero section), popup this macOS card after 3 seconds
   useEffect(() => {
-    const hasVisited = sessionStorage.getItem('vibe_auth_prompt_shown');
-    if (!user && !hasVisited && activePage === 'home') {
+    const hasPrompted = sessionStorage.getItem('vibe_auth_prompt_shown');
+    if (!user && !hasPrompted && activePage === 'home') {
       const timer = setTimeout(() => {
         sessionStorage.setItem('vibe_auth_prompt_shown', 'true');
-        setActivePage('login');
-      }, 1500);
+        setIsAuthModalOpen(true);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [user, activePage]);

@@ -6,12 +6,10 @@ import {
   Lock,
   Phone,
   MapPin,
-  ArrowRight,
   ShieldCheck,
-  Sparkles,
-  ArrowLeft,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft
 } from 'lucide-react';
 
 export const LoginPage = () => {
@@ -58,7 +56,7 @@ export const LoginPage = () => {
         setTimeout(() => {
           loginUser(data.user, data.token);
           setActivePage('home');
-        }, 600);
+        }, 500);
       } else {
         setError(data.message || 'Invalid credentials. Please verify username/password.');
       }
@@ -95,7 +93,7 @@ export const LoginPage = () => {
         setTimeout(() => {
           loginUser(data.user, data.token);
           setActivePage('home');
-        }, 700);
+        }, 600);
       } else {
         setError(data.message || 'Registration failed.');
       }
@@ -109,30 +107,31 @@ export const LoginPage = () => {
   return (
     <div
       style={{
-        minHeight: '85vh',
+        minHeight: '82vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '40px 16px',
+        padding: '24px 16px',
         background: 'radial-gradient(ellipse at top, rgba(0, 113, 227, 0.08), transparent 70%)'
       }}
     >
       <div
         className="mac-window-card"
         style={{
-          maxWidth: 480,
+          maxWidth: 460,
           width: '100%',
-          borderRadius: 24,
-          boxShadow: '0 30px 80px -15px rgba(0, 0, 0, 0.18), 0 0 0 1px var(--border-glass)'
+          borderRadius: 22,
+          overflow: 'hidden',
+          boxShadow: '0 25px 70px -10px rgba(0, 0, 0, 0.22), 0 0 0 1px var(--border-glass)'
         }}
       >
         {/* macOS Title Bar with Traffic Lights */}
-        <div className="mac-window-titlebar">
+        <div className="mac-window-titlebar" style={{ padding: '12px 16px' }}>
           <div className="mac-traffic-lights">
             <button
               className="mac-dot mac-dot-red"
               onClick={() => setActivePage('home')}
-              title="Close window (Return to Storefront)"
+              title="Return to Storefront"
               aria-label="Close"
             />
             <button
@@ -146,18 +145,20 @@ export const LoginPage = () => {
               aria-label="Zoom"
             />
           </div>
-          <div className="mac-window-title">
+          <div className="mac-window-title" style={{ fontSize: 13, fontWeight: 600 }}>
             Vibe Bazzar — System Authentication
           </div>
           <div style={{ width: 44, textAlign: 'right' }}>
             <span
+              onClick={() => setActivePage('home')}
               style={{
                 fontSize: 10,
                 padding: '2px 6px',
                 borderRadius: 4,
                 background: 'rgba(142, 142, 147, 0.15)',
                 color: 'var(--text-dim)',
-                fontWeight: 600
+                fontWeight: 600,
+                cursor: 'pointer'
               }}
             >
               esc
@@ -166,52 +167,42 @@ export const LoginPage = () => {
         </div>
 
         {/* Window Content */}
-        <div style={{ padding: '28px 32px 32px' }}>
+        <div style={{ padding: '20px 24px 22px' }}>
           {/* Brand Icon & Welcome */}
-          <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <div
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
+            <img
+              src="/assets/images/logo/vibe-3d-logo.jpg"
+              alt="Vibe Bazzar"
               style={{
-                width: 68,
-                height: 68,
-                margin: '0 auto 14px',
-                borderRadius: 20,
-                padding: 3,
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2))',
-                boxShadow: '0 10px 25px rgba(0, 113, 227, 0.18)',
-                border: '1px solid var(--border-glass)'
+                width: 48,
+                height: 48,
+                borderRadius: 14,
+                objectFit: 'cover',
+                margin: '0 auto 8px',
+                boxShadow: '0 6px 18px rgba(0, 113, 227, 0.2)',
+                display: 'block'
               }}
-            >
-              <img
-                src="/assets/images/logo/vibe-3d-logo.jpg"
-                alt="Vibe Bazzar"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  borderRadius: 17
-                }}
-              />
-            </div>
+            />
             <h1
               style={{
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: 700,
                 color: 'var(--text-main)',
-                letterSpacing: -0.5,
-                margin: '0 0 6px'
+                letterSpacing: -0.4,
+                margin: '0 0 4px'
               }}
             >
-              {authMode === 'login' ? 'Welcome Back' : 'Create Vibe Account'}
+              {authMode === 'login' ? 'Welcome Back' : 'Create Your Account'}
             </h1>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+            <p style={{ fontSize: 12.5, color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
               {authMode === 'login'
-                ? 'Sign in to access synchronized wishlist, saved cart & orders'
-                : 'Join Vibe Bazzar for exclusive member deals & instant ₹250 cashback'}
+                ? 'Sign in or register to access Vibe Bazzar, unlock member prices & place orders'
+                : 'Register in seconds to unlock member prices, discounts & fast checkout'}
             </p>
           </div>
 
           {/* Cupertino Segmented Picker */}
-          <div className="mac-segmented-control" style={{ marginBottom: 22 }}>
+          <div className="mac-segmented-control" style={{ marginBottom: 14 }}>
             <button
               type="button"
               className={`mac-segmented-item ${authMode === 'login' ? 'active' : ''}`}
@@ -220,6 +211,7 @@ export const LoginPage = () => {
                 setError(null);
                 setSuccessMsg(null);
               }}
+              style={{ padding: '6px 14px', fontSize: 13 }}
             >
               Sign In
             </button>
@@ -231,6 +223,7 @@ export const LoginPage = () => {
                 setError(null);
                 setSuccessMsg(null);
               }}
+              style={{ padding: '6px 14px', fontSize: 13 }}
             >
               Create Account
             </button>
@@ -242,17 +235,17 @@ export const LoginPage = () => {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
-                padding: '10px 14px',
-                borderRadius: 12,
+                gap: 8,
+                padding: '8px 12px',
+                borderRadius: 10,
                 background: 'rgba(239, 68, 68, 0.1)',
                 border: '1px solid rgba(239, 68, 68, 0.25)',
                 color: '#ef4444',
-                fontSize: 13,
-                marginBottom: 18
+                fontSize: 12,
+                marginBottom: 12
               }}
             >
-              <AlertCircle size={18} style={{ flexShrink: 0 }} />
+              <AlertCircle size={15} style={{ flexShrink: 0 }} />
               <span>{error}</span>
             </div>
           )}
@@ -262,32 +255,32 @@ export const LoginPage = () => {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
-                padding: '10px 14px',
-                borderRadius: 12,
+                gap: 8,
+                padding: '8px 12px',
+                borderRadius: 10,
                 background: 'rgba(16, 185, 129, 0.1)',
                 border: '1px solid rgba(16, 185, 129, 0.25)',
                 color: '#10b981',
-                fontSize: 13,
-                marginBottom: 18
+                fontSize: 12,
+                marginBottom: 12
               }}
             >
-              <CheckCircle2 size={18} style={{ flexShrink: 0 }} />
+              <CheckCircle2 size={15} style={{ flexShrink: 0 }} />
               <span>{successMsg}</span>
             </div>
           )}
 
           {/* Form */}
           {authMode === 'login' ? (
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div>
                 <label
                   style={{
                     display: 'block',
-                    fontSize: 12,
+                    fontSize: 11.5,
                     fontWeight: 600,
                     color: 'var(--text-muted)',
-                    marginBottom: 6
+                    marginBottom: 4
                   }}
                 >
                   Email Address or Username
@@ -302,31 +295,31 @@ export const LoginPage = () => {
                     onChange={handleChange}
                     style={{
                       width: '100%',
-                      padding: '12px 14px 12px 40px',
-                      borderRadius: 12,
+                      padding: '9px 12px 9px 36px',
+                      borderRadius: 10,
                       border: '1px solid var(--border-subtle)',
                       background: 'var(--bg-pill)',
                       color: 'var(--text-main)',
-                      fontSize: 14,
+                      fontSize: 13,
                       boxSizing: 'border-box'
                     }}
                   />
                   <User
-                    size={17}
+                    size={15}
                     color="var(--text-dim)"
-                    style={{ position: 'absolute', left: 14, top: 14 }}
+                    style={{ position: 'absolute', left: 12, top: 11 }}
                   />
                 </div>
               </div>
 
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <label style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)' }}>
                     Password
                   </label>
                   <span
-                    onClick={() => alert('For password reset or demo login: enter your username and any test password!')}
-                    style={{ fontSize: 12, color: '#0071e3', cursor: 'pointer', fontWeight: 500 }}
+                    onClick={() => alert('Demo tip: Enter your username and any test password!')}
+                    style={{ fontSize: 11.5, color: '#0071e3', cursor: 'pointer', fontWeight: 500 }}
                   >
                     Forgot Password?
                   </span>
@@ -341,19 +334,19 @@ export const LoginPage = () => {
                     onChange={handleChange}
                     style={{
                       width: '100%',
-                      padding: '12px 14px 12px 40px',
-                      borderRadius: 12,
+                      padding: '9px 12px 9px 36px',
+                      borderRadius: 10,
                       border: '1px solid var(--border-subtle)',
                       background: 'var(--bg-pill)',
                       color: 'var(--text-main)',
-                      fontSize: 14,
+                      fontSize: 13,
                       boxSizing: 'border-box'
                     }}
                   />
                   <Lock
-                    size={17}
+                    size={15}
                     color="var(--text-dim)"
-                    style={{ position: 'absolute', left: 14, top: 14 }}
+                    style={{ position: 'absolute', left: 12, top: 11 }}
                   />
                 </div>
               </div>
@@ -362,15 +355,15 @@ export const LoginPage = () => {
                 type="submit"
                 disabled={loading}
                 className="mac-btn-primary"
-                style={{ width: '100%', padding: '13px', marginTop: 8, fontSize: 14 }}
+                style={{ width: '100%', padding: '11px', marginTop: 4, fontSize: 13 }}
               >
                 {loading ? 'Authenticating with JWT...' : 'Sign In'}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                <label style={{ display: 'block', fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 3 }}>
                   Full Name
                 </label>
                 <input
@@ -381,20 +374,20 @@ export const LoginPage = () => {
                   onChange={handleChange}
                   style={{
                     width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: 12,
+                    padding: '9px 12px',
+                    borderRadius: 10,
                     border: '1px solid var(--border-subtle)',
                     background: 'var(--bg-pill)',
                     color: 'var(--text-main)',
-                    fontSize: 14,
+                    fontSize: 13,
                     boxSizing: 'border-box'
                   }}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                  <label style={{ display: 'block', fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 3 }}>
                     Username *
                   </label>
                   <input
@@ -406,19 +399,19 @@ export const LoginPage = () => {
                     onChange={handleChange}
                     style={{
                       width: '100%',
-                      padding: '12px 14px',
-                      borderRadius: 12,
+                      padding: '9px 12px',
+                      borderRadius: 10,
                       border: '1px solid var(--border-subtle)',
                       background: 'var(--bg-pill)',
                       color: 'var(--text-main)',
-                      fontSize: 14,
+                      fontSize: 13,
                       boxSizing: 'border-box'
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                  <label style={{ display: 'block', fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 3 }}>
                     Email *
                   </label>
                   <input
@@ -430,12 +423,12 @@ export const LoginPage = () => {
                     onChange={handleChange}
                     style={{
                       width: '100%',
-                      padding: '12px 14px',
-                      borderRadius: 12,
+                      padding: '9px 12px',
+                      borderRadius: 10,
                       border: '1px solid var(--border-subtle)',
                       background: 'var(--bg-pill)',
                       color: 'var(--text-main)',
-                      fontSize: 14,
+                      fontSize: 13,
                       boxSizing: 'border-box'
                     }}
                   />
@@ -443,90 +436,42 @@ export const LoginPage = () => {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                  Password (min 6 characters) *
+                <label style={{ display: 'block', fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 3 }}>
+                  Password *
                 </label>
                 <input
                   type="password"
                   name="password"
                   required
-                  placeholder="Create password"
+                  placeholder="Create strong password"
                   value={form.password}
                   onChange={handleChange}
                   style={{
                     width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: 12,
+                    padding: '9px 12px',
+                    borderRadius: 10,
                     border: '1px solid var(--border-subtle)',
                     background: 'var(--bg-pill)',
                     color: 'var(--text-main)',
-                    fontSize: 14,
+                    fontSize: 13,
                     boxSizing: 'border-box'
                   }}
                 />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                    Phone (Optional)
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    placeholder="+91 9876543210"
-                    value={form.phone}
-                    onChange={handleChange}
-                    style={{
-                      width: '100%',
-                      padding: '12px 14px',
-                      borderRadius: 12,
-                      border: '1px solid var(--border-subtle)',
-                      background: 'var(--bg-pill)',
-                      color: 'var(--text-main)',
-                      fontSize: 14,
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                    City (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    name="address"
-                    placeholder="Pune, MH"
-                    value={form.address}
-                    onChange={handleChange}
-                    style={{
-                      width: '100%',
-                      padding: '12px 14px',
-                      borderRadius: 12,
-                      border: '1px solid var(--border-subtle)',
-                      background: 'var(--bg-pill)',
-                      color: 'var(--text-main)',
-                      fontSize: 14,
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
                 className="mac-btn-primary"
-                style={{ width: '100%', padding: '13px', marginTop: 8, fontSize: 14 }}
+                style={{ width: '100%', padding: '11px', marginTop: 4, fontSize: 13 }}
               >
-                {loading ? 'Creating Account in Supabase...' : 'Register in Supabase'}
+                {loading ? 'Creating Account in Supabase...' : 'Register Account'}
               </button>
             </form>
           )}
 
           {/* Quick Continue as Guest */}
-          <div style={{ textAlign: 'center', marginTop: 20 }}>
+          <div style={{ textAlign: 'center', marginTop: 12 }}>
             <button
               type="button"
               onClick={() => setActivePage('home')}
@@ -534,15 +479,15 @@ export const LoginPage = () => {
                 background: 'transparent',
                 border: 'none',
                 color: 'var(--text-muted)',
-                fontSize: 13,
+                fontSize: 12.5,
                 fontWeight: 600,
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 6
+                gap: 5
               }}
             >
-              <ArrowLeft size={15} />
+              <ArrowLeft size={14} />
               Continue Browsing as Guest
             </button>
           </div>
@@ -550,18 +495,18 @@ export const LoginPage = () => {
           {/* Security Badge */}
           <div
             style={{
-              marginTop: 22,
-              paddingTop: 16,
+              marginTop: 14,
+              paddingTop: 10,
               borderTop: '1px solid var(--border-subtle)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 8,
-              fontSize: 12,
+              gap: 6,
+              fontSize: 11,
               color: 'var(--text-muted)'
             }}
           >
-            <ShieldCheck size={16} color="#10b981" />
+            <ShieldCheck size={14} color="#10b981" />
             <span>Encrypted with bcrypt &amp; Secure JWT Token</span>
           </div>
         </div>

@@ -8,7 +8,8 @@ import {
   MapPin,
   ShieldCheck,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft
 } from 'lucide-react';
 
 export const AuthModal = () => {
@@ -108,20 +109,30 @@ export const AuthModal = () => {
     <div
       className="mac-modal-overlay"
       onClick={() => setIsAuthModalOpen(false)}
-      style={{ zIndex: 100000 }}
+      style={{
+        zIndex: 100000,
+        background: 'rgba(15, 23, 42, 0.55)',
+        backdropFilter: 'blur(16px) saturate(180%)'
+      }}
     >
       <div
         className="mac-window-card"
-        style={{ maxWidth: 460, width: '100%' }}
+        style={{
+          maxWidth: 460,
+          width: '100%',
+          overflow: 'hidden',
+          borderRadius: 22,
+          boxShadow: '0 25px 70px -10px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--border-glass)'
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* macOS Title Bar with Traffic Lights */}
-        <div className="mac-window-titlebar">
+        <div className="mac-window-titlebar" style={{ padding: '12px 16px' }}>
           <div className="mac-traffic-lights">
             <button
               className="mac-dot mac-dot-red"
               onClick={() => setIsAuthModalOpen(false)}
-              title="Close window"
+              title="Close popup"
               aria-label="Close"
             />
             <button
@@ -136,18 +147,20 @@ export const AuthModal = () => {
               aria-label="Zoom"
             />
           </div>
-          <div className="mac-window-title">
-            Vibe Bazzar — Sign In
+          <div className="mac-window-title" style={{ fontSize: 13, fontWeight: 600 }}>
+            Vibe Bazzar — System Authentication
           </div>
           <div style={{ width: 44, textAlign: 'right' }}>
             <span
+              onClick={() => setIsAuthModalOpen(false)}
               style={{
                 fontSize: 10,
                 padding: '2px 6px',
                 borderRadius: 4,
                 background: 'rgba(142, 142, 147, 0.15)',
                 color: 'var(--text-dim)',
-                fontWeight: 600
+                fontWeight: 600,
+                cursor: 'pointer'
               }}
             >
               esc
@@ -156,37 +169,38 @@ export const AuthModal = () => {
         </div>
 
         {/* Modal Body */}
-        <div style={{ padding: '24px 28px 28px' }}>
-          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        <div style={{ padding: '20px 24px 22px' }}>
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
             <img
               src="/assets/images/logo/vibe-3d-logo.jpg"
               alt="Vibe Bazzar"
               style={{
-                width: 54,
-                height: 54,
-                borderRadius: 16,
+                width: 48,
+                height: 48,
+                borderRadius: 14,
                 objectFit: 'cover',
-                margin: '0 auto 10px',
-                boxShadow: '0 8px 20px rgba(0, 113, 227, 0.2)',
+                margin: '0 auto 8px',
+                boxShadow: '0 6px 18px rgba(0, 113, 227, 0.2)',
                 display: 'block'
               }}
             />
             <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px', letterSpacing: -0.4 }}>
-              {authMode === 'login' ? 'Welcome to Vibe Bazzar' : 'Create Account'}
+              {authMode === 'login' ? 'Welcome Back' : 'Create Your Account'}
             </h2>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+            <p style={{ fontSize: 12.5, color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
               {authMode === 'login'
-                ? 'Sign in to access your saved cart, orders & festive discounts'
-                : 'Sign up in seconds and get instant ₹250 first order cashback'}
+                ? 'Sign in or register to access Vibe Bazzar, unlock member prices & place orders'
+                : 'Register in seconds to unlock member prices, discounts & fast checkout'}
             </p>
           </div>
 
           {/* Segmented Switcher */}
-          <div className="mac-segmented-control" style={{ marginBottom: 18 }}>
+          <div className="mac-segmented-control" style={{ marginBottom: 14 }}>
             <button
               type="button"
               className={`mac-segmented-item ${authMode === 'login' ? 'active' : ''}`}
               onClick={() => { setAuthMode('login'); setError(null); setSuccessMsg(null); }}
+              style={{ padding: '6px 14px', fontSize: 13 }}
             >
               Sign In
             </button>
@@ -194,6 +208,7 @@ export const AuthModal = () => {
               type="button"
               className={`mac-segmented-item ${authMode === 'register' ? 'active' : ''}`}
               onClick={() => { setAuthMode('register'); setError(null); setSuccessMsg(null); }}
+              style={{ padding: '6px 14px', fontSize: 13 }}
             >
               Create Account
             </button>
@@ -205,16 +220,16 @@ export const AuthModal = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
-                padding: '10px 12px',
+                padding: '8px 12px',
                 borderRadius: 10,
                 background: 'rgba(239, 68, 68, 0.1)',
                 border: '1px solid rgba(239, 68, 68, 0.25)',
                 color: '#ef4444',
                 fontSize: 12,
-                marginBottom: 16
+                marginBottom: 12
               }}
             >
-              <AlertCircle size={16} style={{ flexShrink: 0 }} />
+              <AlertCircle size={15} style={{ flexShrink: 0 }} />
               <span>{error}</span>
             </div>
           )}
@@ -225,37 +240,37 @@ export const AuthModal = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
-                padding: '10px 12px',
+                padding: '8px 12px',
                 borderRadius: 10,
                 background: 'rgba(16, 185, 129, 0.1)',
                 border: '1px solid rgba(16, 185, 129, 0.25)',
                 color: '#10b981',
                 fontSize: 12,
-                marginBottom: 16
+                marginBottom: 12
               }}
             >
-              <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
+              <CheckCircle2 size={15} style={{ flexShrink: 0 }} />
               <span>{successMsg}</span>
             </div>
           )}
 
           {authMode === 'login' ? (
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 5 }}>
-                  Email or Username
+                <label style={{ display: 'block', fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>
+                  Email Address or Username
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type="text"
                     name="loginId"
                     required
-                    placeholder="Enter email or username"
+                    placeholder="e.g. ompatil or ompatil@example.com"
                     value={form.loginId}
                     onChange={handleChange}
                     style={{
                       width: '100%',
-                      padding: '10px 12px 10px 36px',
+                      padding: '9px 12px 9px 36px',
                       borderRadius: 10,
                       border: '1px solid var(--border-subtle)',
                       background: 'var(--bg-pill)',
@@ -264,14 +279,22 @@ export const AuthModal = () => {
                       boxSizing: 'border-box'
                     }}
                   />
-                  <User size={15} color="var(--text-dim)" style={{ position: 'absolute', left: 12, top: 12 }} />
+                  <User size={15} color="var(--text-dim)" style={{ position: 'absolute', left: 12, top: 11 }} />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 5 }}>
-                  Password
-                </label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <label style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)' }}>
+                    Password
+                  </label>
+                  <span
+                    onClick={() => alert('Demo tip: Enter your username and any test password!')}
+                    style={{ fontSize: 11.5, color: '#0071e3', cursor: 'pointer', fontWeight: 500 }}
+                  >
+                    Forgot Password?
+                  </span>
+                </div>
                 <div style={{ position: 'relative' }}>
                   <input
                     type="password"
@@ -282,7 +305,7 @@ export const AuthModal = () => {
                     onChange={handleChange}
                     style={{
                       width: '100%',
-                      padding: '10px 12px 10px 36px',
+                      padding: '9px 12px 9px 36px',
                       borderRadius: 10,
                       border: '1px solid var(--border-subtle)',
                       background: 'var(--bg-pill)',
@@ -291,7 +314,7 @@ export const AuthModal = () => {
                       boxSizing: 'border-box'
                     }}
                   />
-                  <Lock size={15} color="var(--text-dim)" style={{ position: 'absolute', left: 12, top: 12 }} />
+                  <Lock size={15} color="var(--text-dim)" style={{ position: 'absolute', left: 12, top: 11 }} />
                 </div>
               </div>
 
@@ -299,15 +322,15 @@ export const AuthModal = () => {
                 type="submit"
                 disabled={loading}
                 className="mac-btn-primary"
-                style={{ width: '100%', padding: '12px', marginTop: 6 }}
+                style={{ width: '100%', padding: '11px', marginTop: 4, fontSize: 13 }}
               >
-                {loading ? 'Authenticating...' : 'Sign In with JWT'}
+                {loading ? 'Authenticating with JWT...' : 'Sign In'}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>
+                <label style={{ display: 'block', fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 3 }}>
                   Full Name
                 </label>
                 <input
@@ -318,7 +341,7 @@ export const AuthModal = () => {
                   onChange={handleChange}
                   style={{
                     width: '100%',
-                    padding: '10px 12px',
+                    padding: '9px 12px',
                     borderRadius: 10,
                     border: '1px solid var(--border-subtle)',
                     background: 'var(--bg-pill)',
@@ -329,9 +352,9 @@ export const AuthModal = () => {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>
+                  <label style={{ display: 'block', fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 3 }}>
                     Username *
                   </label>
                   <input
@@ -343,7 +366,7 @@ export const AuthModal = () => {
                     onChange={handleChange}
                     style={{
                       width: '100%',
-                      padding: '10px 12px',
+                      padding: '9px 12px',
                       borderRadius: 10,
                       border: '1px solid var(--border-subtle)',
                       background: 'var(--bg-pill)',
@@ -354,7 +377,7 @@ export const AuthModal = () => {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>
+                  <label style={{ display: 'block', fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 3 }}>
                     Email *
                   </label>
                   <input
@@ -366,7 +389,7 @@ export const AuthModal = () => {
                     onChange={handleChange}
                     style={{
                       width: '100%',
-                      padding: '10px 12px',
+                      padding: '9px 12px',
                       borderRadius: 10,
                       border: '1px solid var(--border-subtle)',
                       background: 'var(--bg-pill)',
@@ -379,19 +402,19 @@ export const AuthModal = () => {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>
+                <label style={{ display: 'block', fontSize: 11.5, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 3 }}>
                   Password *
                 </label>
                 <input
                   type="password"
                   name="password"
                   required
-                  placeholder="Create password"
+                  placeholder="Create strong password"
                   value={form.password}
                   onChange={handleChange}
                   style={{
                     width: '100%',
-                    padding: '10px 12px',
+                    padding: '9px 12px',
                     borderRadius: 10,
                     border: '1px solid var(--border-subtle)',
                     background: 'var(--bg-pill)',
@@ -406,17 +429,39 @@ export const AuthModal = () => {
                 type="submit"
                 disabled={loading}
                 className="mac-btn-primary"
-                style={{ width: '100%', padding: '12px', marginTop: 6 }}
+                style={{ width: '100%', padding: '11px', marginTop: 4, fontSize: 13 }}
               >
-                {loading ? 'Creating...' : 'Register in Supabase'}
+                {loading ? 'Creating Account in Supabase...' : 'Register Account'}
               </button>
             </form>
           )}
 
+          {/* Continue as Guest Button */}
+          <div style={{ textAlign: 'center', marginTop: 12 }}>
+            <button
+              type="button"
+              onClick={() => setIsAuthModalOpen(false)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-muted)',
+                fontSize: 12.5,
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5
+              }}
+            >
+              <ArrowLeft size={14} />
+              Continue Browsing as Guest
+            </button>
+          </div>
+
           <div
             style={{
-              marginTop: 18,
-              paddingTop: 12,
+              marginTop: 14,
+              paddingTop: 10,
               borderTop: '1px solid var(--border-subtle)',
               display: 'flex',
               alignItems: 'center',
