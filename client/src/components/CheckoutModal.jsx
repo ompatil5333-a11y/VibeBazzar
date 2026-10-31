@@ -241,7 +241,7 @@ export const CheckoutModal = () => {
                   type="text"
                   name="name"
                   required
-                  placeholder="e.g. Om Patil"
+                  placeholder="Enter full name"
                   value={form.name}
                   onChange={handleChange}
                 />
@@ -254,7 +254,7 @@ export const CheckoutModal = () => {
                     type="email"
                     name="email"
                     required
-                    placeholder="ompatil5333@gmail.com"
+                    placeholder="Enter email address"
                     value={form.email}
                     onChange={handleChange}
                   />

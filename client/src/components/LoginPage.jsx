@@ -290,7 +290,7 @@ export const LoginPage = () => {
                     type="text"
                     name="loginId"
                     required
-                    placeholder="e.g. ompatil or ompatil@example.com"
+                    placeholder="Enter email or username"
                     value={form.loginId}
                     onChange={handleChange}
                     style={{
@@ -369,7 +369,7 @@ export const LoginPage = () => {
                 <input
                   type="text"
                   name="fullName"
-                  placeholder="e.g. Om Patil"
+                  placeholder=""
                   value={form.fullName}
                   onChange={handleChange}
                   style={{
@@ -394,7 +394,7 @@ export const LoginPage = () => {
                     type="text"
                     name="username"
                     required
-                    placeholder="ompatil"
+                    placeholder=""
                     value={form.username}
                     onChange={handleChange}
                     style={{
@@ -418,7 +418,7 @@ export const LoginPage = () => {
                     type="email"
                     name="email"
                     required
-                    placeholder="om@example.com"
+                    placeholder=""
                     value={form.email}
                     onChange={handleChange}
                     style={{

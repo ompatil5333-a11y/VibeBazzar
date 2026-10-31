@@ -29,6 +29,35 @@ import {
 export const AdminPanel = () => {
   const { formatPrice, currencySymbol, setActivePage } = useShop();
 
+  // Admin Authentication State (admin123 / admin123)
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
+    try {
+      return sessionStorage.getItem('vibe_admin_authenticated') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [adminUsername, setAdminUsername] = useState('admin123');
+  const [adminPassword, setAdminPassword] = useState('admin123');
+  const [adminAuthError, setAdminAuthError] = useState('');
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (adminUsername.trim() === 'admin123' && adminPassword.trim() === 'admin123') {
+      setIsAdminAuthenticated(true);
+      sessionStorage.setItem('vibe_admin_authenticated', 'true');
+      setAdminAuthError('');
+      fetchData();
+    } else {
+      setAdminAuthError('Invalid credentials. Required: Username "admin123" and Password "admin123".');
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminAuthenticated(false);
+    sessionStorage.removeItem('vibe_admin_authenticated');
+  };
+
   const [activeTab, setActiveTab] = useState('products'); // 'products' | 'costing' | 'orders' | 'offers' | 'sql'
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -317,6 +346,204 @@ WHERE table_name IN ('products', 'orders');`;
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
+  // 1. If not authenticated as Admin, show macOS Admin Login Card
+  if (!isAdminAuthenticated) {
+    return (
+      <div
+        style={{
+          minHeight: '82vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '30px 16px',
+          background: 'radial-gradient(ellipse at top, rgba(0, 113, 227, 0.12), transparent 70%)'
+        }}
+      >
+        <div
+          className="mac-window-card"
+          style={{
+            maxWidth: 460,
+            width: '100%',
+            borderRadius: 22,
+            overflow: 'hidden',
+            boxShadow: '0 25px 70px -10px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--border-glass)'
+          }}
+        >
+          {/* macOS Title Bar with Traffic Lights */}
+          <div className="mac-window-titlebar" style={{ padding: '12px 16px' }}>
+            <div className="mac-traffic-lights">
+              <button
+                className="mac-dot mac-dot-red"
+                onClick={() => setActivePage('home')}
+                title="Return to Storefront"
+                aria-label="Close"
+              />
+              <button className="mac-dot mac-dot-yellow" aria-label="Minimize" />
+              <button className="mac-dot mac-dot-green" aria-label="Zoom" />
+            </div>
+            <div className="mac-window-title" style={{ fontSize: 13, fontWeight: 600 }}>
+              Vibe Bazzar — Admin &amp; Merchant Authentication
+            </div>
+            <div style={{ width: 44, textAlign: 'right' }}>
+              <span
+                onClick={() => setActivePage('home')}
+                style={{
+                  fontSize: 10,
+                  padding: '2px 6px',
+                  borderRadius: 4,
+                  background: 'rgba(142, 142, 147, 0.15)',
+                  color: 'var(--text-dim)',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                esc
+              </span>
+            </div>
+          </div>
+
+          <div style={{ padding: '24px 28px' }}>
+            <div style={{ textAlign: 'center', marginBottom: 18 }}>
+              <div
+                style={{
+                  width: 50,
+                  height: 50,
+                  margin: '0 auto 10px',
+                  borderRadius: 15,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'rgba(0, 113, 227, 0.12)',
+                  border: '1px solid rgba(0, 113, 227, 0.25)',
+                  color: '#0071e3'
+                }}
+              >
+                <ShieldCheck size={26} />
+              </div>
+              <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 4px' }}>
+                Admin &amp; Merchant Studio
+              </h1>
+              <p style={{ fontSize: 12.5, color: 'var(--text-muted)', margin: 0 }}>
+                Restricted portal to manage catalog cards, pricing, stock &amp; customer orders
+              </p>
+            </div>
+
+            {/* Hint Box with required credentials */}
+            <div
+              style={{
+                background: 'rgba(0, 113, 227, 0.08)',
+                border: '1px solid rgba(0, 113, 227, 0.2)',
+                borderRadius: 12,
+                padding: '10px 14px',
+                marginBottom: 16,
+                fontSize: 12,
+                color: 'var(--text-main)'
+              }}
+            >
+              <div style={{ fontWeight: 700, color: '#0071e3', marginBottom: 2 }}>
+                🔒 Pre-configured Merchant Credentials:
+              </div>
+              <div>Username: <b style={{ fontFamily: 'monospace' }}>admin123</b></div>
+              <div>Password: <b style={{ fontFamily: 'monospace' }}>admin123</b></div>
+            </div>
+
+            {adminAuthError && (
+              <div
+                style={{
+                  padding: '9px 12px',
+                  borderRadius: 10,
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                  color: '#ef4444',
+                  fontSize: 12,
+                  marginBottom: 14
+                }}
+              >
+                {adminAuthError}
+              </div>
+            )}
+
+            <form onSubmit={handleAdminLogin} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>
+                  Admin Username
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="admin123"
+                  value={adminUsername}
+                  onChange={(e) => setAdminUsername(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: 10,
+                    border: '1px solid var(--border-subtle)',
+                    background: 'var(--bg-pill)',
+                    color: 'var(--text-main)',
+                    fontSize: 13,
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>
+                  Admin Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  placeholder="admin123"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: 10,
+                    border: '1px solid var(--border-subtle)',
+                    background: 'var(--bg-pill)',
+                    color: 'var(--text-main)',
+                    fontSize: 13,
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="mac-btn-primary"
+                style={{ width: '100%', padding: '12px', marginTop: 4, fontSize: 13 }}
+              >
+                Sign In to Admin Studio
+              </button>
+            </form>
+
+            <div style={{ textAlign: 'center', marginTop: 14 }}>
+              <button
+                type="button"
+                onClick={() => setActivePage('home')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4
+                }}
+              >
+                ← Return to Storefront
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-studio-container">
       {/* macOS Main Window Frame */}
@@ -355,6 +582,14 @@ WHERE table_name IN ('products', 'orders');`;
               }}
             >
               <RefreshCw size={15} className={loading ? 'spin' : ''} />
+            </button>
+            <button
+              onClick={handleAdminLogout}
+              className="mac-btn-secondary"
+              style={{ fontSize: 11, padding: '4px 10px', borderRadius: 8 }}
+              title="Lock and Sign Out"
+            >
+              🔒 Lock / Sign Out
             </button>
           </div>
         </div>

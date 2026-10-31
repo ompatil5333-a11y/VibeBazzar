@@ -42,7 +42,7 @@ export const Banner = () => {
 
   return (
     <div className="banner">
-      <div className="container">
+      <div className="banner-fluid-wrapper">
         <div className="slider-container has-scrollbar">
           {bannerData.map((item, index) => (
             <div

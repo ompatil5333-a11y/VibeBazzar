@@ -441,19 +441,6 @@ export const Header = () => {
                 24x7 Customer Care
               </span>
             </li>
-
-            <li className="menu-category">
-              <span
-                className={`menu-title ${activePage === 'admin' ? 'active' : ''}`}
-                onClick={() => setActivePage('admin')}
-                style={{
-                  color: activePage === 'admin' ? '#0071e3' : undefined,
-                  fontWeight: 700
-                }}
-              >
-                🛡️ Admin Studio
-              </span>
-            </li>
           </ul>
         </div>
       </nav>
