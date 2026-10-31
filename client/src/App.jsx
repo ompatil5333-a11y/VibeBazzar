@@ -22,6 +22,8 @@ import { DealsPage } from './components/DealsPage';
 import { OrdersPage } from './components/OrdersPage';
 import { WishlistPage } from './components/WishlistPage';
 import { SupportPage } from './components/SupportPage';
+import { LoginPage } from './components/LoginPage';
+import { AdminPanel } from './components/AdminPanel';
 
 export function App() {
   const { activePage } = useShop();
@@ -51,7 +53,11 @@ export function App() {
 
       {/* 2. Main Content Views */}
       <main>
-        {activePage === 'deals' ? (
+        {activePage === 'login' ? (
+          <LoginPage />
+        ) : activePage === 'admin' ? (
+          <AdminPanel />
+        ) : activePage === 'deals' ? (
           <DealsPage products={products} />
         ) : activePage === 'orders' ? (
           <OrdersPage />

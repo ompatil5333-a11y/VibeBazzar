@@ -3,7 +3,7 @@ import { useShop } from '../context/ShopContext';
 import { X, Check, Sparkles } from 'lucide-react';
 
 export const NewsletterModal = () => {
-  const { isNewsletterOpen, setIsNewsletterOpen } = useShop();
+  const { isNewsletterOpen, setIsNewsletterOpen, activePage } = useShop();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState({ state: 'idle', message: '' });
 
@@ -11,14 +11,17 @@ export const NewsletterModal = () => {
     const hasSeen = sessionStorage.getItem('vibe_newsletter_seen');
     if (!hasSeen) {
       const timer = setTimeout(() => {
-        setIsNewsletterOpen(true);
-        sessionStorage.setItem('vibe_newsletter_seen', 'true');
-      }, 1500);
+        const path = window.location.pathname;
+        if (!path.includes('login') && !path.includes('admin')) {
+          setIsNewsletterOpen(true);
+          sessionStorage.setItem('vibe_newsletter_seen', 'true');
+        }
+      }, 20000);
       return () => clearTimeout(timer);
     }
   }, [setIsNewsletterOpen]);
 
-  if (!isNewsletterOpen) return null;
+  if (!isNewsletterOpen || activePage === 'login' || activePage === 'admin') return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

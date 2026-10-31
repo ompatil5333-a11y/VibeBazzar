@@ -1,6 +1,51 @@
 import { pool } from '../config/db.js';
 
-let fallbackOrders = [];
+let fallbackOrders = [
+  {
+    id: 'ORD-1730000000000-842',
+    userId: 1,
+    customerName: 'Om Patil',
+    customerEmail: 'ompatil@example.com',
+    customerPhone: '+91 9876543210',
+    shippingAddress: 'Flat 402, Apple Court, MG Road, Pune, Maharashtra 411001',
+    items: [
+      {
+        id: 1,
+        title: 'Vibe Elite Winter Bomber Leather Jacket',
+        quantity: 1,
+        price: 2499.00
+      }
+    ],
+    totalAmount: '2499.00',
+    paymentMethod: 'razorpay',
+    paymentStatus: 'paid',
+    orderStatus: 'accepted',
+    adminNotes: 'Verified and packed for priority dispatch.',
+    createdAt: new Date(Date.now() - 3600000 * 4).toISOString()
+  },
+  {
+    id: 'ORD-1730000000000-319',
+    userId: null,
+    customerName: 'Priya Sharma',
+    customerEmail: 'priya.s@example.com',
+    customerPhone: '+91 9123456789',
+    shippingAddress: 'Villa 12, Palm Meadows, Whitefield, Bengaluru 560066',
+    items: [
+      {
+        id: 7,
+        title: 'Vibe Pulse AMOLED Fitness Smartwatch',
+        quantity: 1,
+        price: 3499.00
+      }
+    ],
+    totalAmount: '3499.00',
+    paymentMethod: 'razorpay',
+    paymentStatus: 'paid',
+    orderStatus: 'pending',
+    adminNotes: 'Awaiting warehouse stock verification.',
+    createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
+  }
+];
 
 export const createOrder = async (req, res) => {
   try {
@@ -34,14 +79,15 @@ export const createOrder = async (req, res) => {
       totalAmount: Number(totalAmount).toFixed(2),
       paymentMethod,
       paymentStatus: paymentMethod === 'razorpay' ? 'paid' : 'pending',
-      orderStatus: 'confirmed',
+      orderStatus: 'pending', // Defaults to pending until admin accepts
+      adminNotes: '',
       createdAt: new Date().toISOString()
     };
 
     try {
       await pool.query(
-        `INSERT INTO orders (id, user_id, customer_name, customer_email, customer_phone, shipping_address, total_amount, payment_method, payment_status, order_status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        `INSERT INTO orders (id, user_id, customer_name, customer_email, customer_phone, shipping_address, total_amount, payment_method, payment_status, order_status, admin_notes)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
         [
           newOrder.id,
           newOrder.userId,
@@ -52,7 +98,8 @@ export const createOrder = async (req, res) => {
           newOrder.totalAmount,
           paymentMethod,
           newOrder.paymentStatus,
-          newOrder.orderStatus
+          newOrder.orderStatus,
+          ''
         ]
       );
 
@@ -71,7 +118,6 @@ export const createOrder = async (req, res) => {
         );
       }
 
-      // If user is authenticated, clear their persisted cart
       if (newOrder.userId) {
         try {
           await pool.query('DELETE FROM user_cart WHERE user_id = $1', [newOrder.userId]);
@@ -114,12 +160,110 @@ export const getOrders = async (req, res) => {
       query += ' ORDER BY created_at DESC';
 
       const dbRes = await pool.query(query, params);
-      return res.json({ success: true, count: dbRes.rows.length, data: dbRes.rows });
+      if (dbRes.rows && dbRes.rows.length > 0) {
+        // Fetch items for each order
+        const ordersWithItems = await Promise.all(
+          dbRes.rows.map(async (o) => {
+            try {
+              const itemRes = await pool.query('SELECT * FROM order_items WHERE order_id = $1', [o.id]);
+              return {
+                id: o.id,
+                userId: o.user_id,
+                customerName: o.customer_name,
+                customerEmail: o.customer_email,
+                customerPhone: o.customer_phone,
+                shippingAddress: o.shipping_address,
+                totalAmount: o.total_amount,
+                paymentMethod: o.payment_method,
+                paymentStatus: o.payment_status,
+                orderStatus: o.order_status,
+                adminNotes: o.admin_notes || '',
+                createdAt: o.created_at,
+                items: itemRes.rows.map((i) => ({
+                  id: i.product_id,
+                  title: i.product_title,
+                  quantity: i.quantity,
+                  price: parseFloat(i.unit_price)
+                }))
+              };
+            } catch {
+              return {
+                id: o.id,
+                customerName: o.customer_name,
+                customerEmail: o.customer_email,
+                totalAmount: o.total_amount,
+                orderStatus: o.order_status,
+                adminNotes: o.admin_notes || '',
+                createdAt: o.created_at,
+                items: []
+              };
+            }
+          })
+        );
+
+        return res.json({ success: true, count: ordersWithItems.length, data: ordersWithItems });
+      }
     } catch (dbErr) {
       console.warn('DB error on getOrders:', dbErr.message);
     }
 
-    return res.json({ success: true, count: fallbackOrders.length, data: fallbackOrders });
+    let results = [...fallbackOrders];
+    if (userId) {
+      results = results.filter((o) => o.userId === parseInt(userId, 10));
+    }
+
+    return res.json({ success: true, count: results.length, data: results });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// UPDATE ORDER STATUS (Accept / Reject / Shipped / Delivered)
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, adminNotes } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ success: false, message: 'Status is required' });
+    }
+
+    const validStatuses = ['pending', 'accepted', 'rejected', 'processing', 'shipped', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+      });
+    }
+
+    // Try DB update
+    try {
+      await pool.query(
+        'UPDATE orders SET order_status = $1, admin_notes = COALESCE($2, admin_notes) WHERE id = $3',
+        [status, adminNotes || '', id]
+      );
+    } catch (dbErr) {
+      console.warn('DB error on updateOrderStatus:', dbErr.message);
+    }
+
+    // Update in-memory fallback
+    const orderIdx = fallbackOrders.findIndex((o) => o.id === id);
+    if (orderIdx !== -1) {
+      fallbackOrders[orderIdx].orderStatus = status;
+      if (adminNotes !== undefined) {
+        fallbackOrders[orderIdx].adminNotes = adminNotes;
+      }
+      return res.json({
+        success: true,
+        message: `Order #${id} status updated to ${status}`,
+        order: fallbackOrders[orderIdx]
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: `Order #${id} status updated to ${status}`
+    });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

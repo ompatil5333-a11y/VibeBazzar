@@ -66,10 +66,19 @@ export const Footer = () => {
 
           <ul className="footer-nav-list">
             <li className="footer-nav-item">
-              <h2 className="nav-title">Our Company</h2>
+              <h2 className="nav-title">Merchant &amp; Company</h2>
             </li>
-            <li className="footer-nav-item"><a href="#" className="footer-nav-link">About Vibe Bazzar</a></li>
-            <li className="footer-nav-item"><a href="#" className="footer-nav-link">Careers at Vibe</a></li>
+            <li className="footer-nav-item">
+              <span
+                onClick={() => setActivePage('admin')}
+                className="footer-nav-link"
+                style={{ cursor: 'pointer', color: '#0071e3', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                <ShieldCheck size={16} /> Admin Studio &amp; Inventory
+              </span>
+            </li>
+            <li className="footer-nav-item"><span onClick={() => setActivePage('deals')} className="footer-nav-link" style={{ cursor: 'pointer' }}>Flash Sale Manager</span></li>
+            <li className="footer-nav-item"><span onClick={() => setActivePage('login')} className="footer-nav-link" style={{ cursor: 'pointer' }}>Merchant Sign In</span></li>
             <li className="footer-nav-item"><a href="#" className="footer-nav-link">Terms &amp; Conditions</a></li>
             <li className="footer-nav-item"><a href="#" className="footer-nav-link">Privacy Policy</a></li>
           </ul>
@@ -97,15 +106,26 @@ export const Footer = () => {
       {/* 3. Footer Bottom */}
       <div className="footer-bottom">
         <div className="container">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <img
-              src="/assets/images/payment.png"
-              alt="payment method"
-              className="payment-img"
-            />
-            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-              Powered by Razorpay (UPI, RuPay, Cards &amp; NetBanking)
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <img
+                src="/assets/images/payment.png"
+                alt="payment method"
+                className="payment-img"
+              />
+              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                Powered by Razorpay (UPI, RuPay, Cards &amp; NetBanking)
+              </span>
+            </div>
+
+            <button
+              onClick={() => setActivePage('admin')}
+              className="mac-btn-secondary"
+              style={{ fontSize: 11, padding: '5px 12px', borderRadius: 9999, gap: 5 }}
+              title="Open Admin Studio"
+            >
+              <ShieldCheck size={13} color="#0071e3" /> Admin Studio
+            </button>
           </div>
 
           <p className="copyright">

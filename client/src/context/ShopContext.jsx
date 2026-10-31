@@ -24,17 +24,60 @@ export const ShopProvider = ({ children }) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
 
-  // Auto-pop up Auth Modal once on initial visit if not logged in
+  // Helper to determine initial view from browser URL path
+  const getInitialPage = () => {
+    try {
+      const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+      if (path === 'login') return 'login';
+      if (path === 'admin') return 'admin';
+      if (path === 'deals') return 'deals';
+      if (path === 'orders') return 'orders';
+      if (path === 'wishlist') return 'wishlist';
+      if (path === 'support') return 'support';
+      return 'home';
+    } catch {
+      return 'home';
+    }
+  };
+
+  // 4. Navigation View / Pages with URL Synchronization
+  const [activePage, setActivePageState] = useState(getInitialPage);
+
+  const setActivePage = (page, updateUrl = true) => {
+    setActivePageState(page);
+    if (updateUrl && typeof window !== 'undefined') {
+      const newPath = page === 'home' ? '/' : `/${page}`;
+      if (window.location.pathname !== newPath) {
+        window.history.pushState({ page }, '', newPath);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+      if (['login', 'admin', 'deals', 'orders', 'wishlist', 'support'].includes(path)) {
+        setActivePageState(path);
+      } else {
+        setActivePageState('home');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // When user visits vibebazzar.vercel.app, render /login after 1.5s if not logged in
   useEffect(() => {
     const hasVisited = sessionStorage.getItem('vibe_auth_prompt_shown');
-    if (!user && !hasVisited) {
+    if (!user && !hasVisited && activePage === 'home') {
       const timer = setTimeout(() => {
-        setIsAuthModalOpen(true);
         sessionStorage.setItem('vibe_auth_prompt_shown', 'true');
-      }, 1200);
+        setActivePage('login');
+      }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [user]);
+  }, [user, activePage]);
 
   // Check token validity on load
   useEffect(() => {
@@ -137,8 +180,6 @@ export const ShopProvider = ({ children }) => {
 
   const currencySymbol = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : '₹';
 
-  // 4. Navigation View / Pages
-  const [activePage, setActivePage] = useState('home');
 
   // 5. Cart State
   const [cart, setCart] = useState(() => {

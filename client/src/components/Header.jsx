@@ -238,6 +238,30 @@ export const Header = () => {
                     </button>
                     <button
                       onClick={() => {
+                        setActivePage('admin');
+                        setProfileDropdownOpen(false);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '8px 10px',
+                        borderRadius: 8,
+                        background: 'rgba(0, 113, 227, 0.1)',
+                        border: 'none',
+                        color: '#0071e3',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        marginBottom: 6,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6
+                      }}
+                    >
+                      🛡️ Admin Studio
+                    </button>
+                    <button
+                      onClick={() => {
                         logout();
                         setProfileDropdownOpen(false);
                       }}
@@ -267,8 +291,7 @@ export const Header = () => {
                 className="action-btn"
                 title="Sign In / Register"
                 onClick={() => {
-                  setAuthMode('login');
-                  setIsAuthModalOpen(true);
+                  setActivePage('login');
                 }}
               >
                 <User size={20} />
@@ -416,6 +439,19 @@ export const Header = () => {
               >
                 <HelpCircle size={15} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
                 24x7 Customer Care
+              </span>
+            </li>
+
+            <li className="menu-category">
+              <span
+                className={`menu-title ${activePage === 'admin' ? 'active' : ''}`}
+                onClick={() => setActivePage('admin')}
+                style={{
+                  color: activePage === 'admin' ? '#0071e3' : undefined,
+                  fontWeight: 700
+                }}
+              >
+                🛡️ Admin Studio
               </span>
             </li>
           </ul>

@@ -1,6 +1,9 @@
--- Supabase PostgreSQL Schema for Vibe Bazzar eCommerce
+-- ==============================================================================
+-- Supabase PostgreSQL Schema & Migration for Vibe Bazzar Full-Stack eCommerce
+-- Paste this script into your Supabase Dashboard -> SQL Editor and click RUN
+-- ==============================================================================
 
--- 1. Users Table (Authentication & Profile)
+-- 1. Users Table (Authentication & Customer Profiles)
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   username VARCHAR(100) UNIQUE NOT NULL,
@@ -9,10 +12,11 @@ CREATE TABLE IF NOT EXISTS users (
   full_name VARCHAR(255),
   phone VARCHAR(50),
   address TEXT,
+  role VARCHAR(50) DEFAULT 'customer', -- 'customer' | 'admin'
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. User Cart Table (Persistent Database Cart per User)
+-- 2. User Cart Table (Persistent Shopping Cart per User)
 CREATE TABLE IF NOT EXISTS user_cart (
   id SERIAL PRIMARY KEY,
   user_id INT REFERENCES users(id) ON DELETE CASCADE,
@@ -32,7 +36,7 @@ CREATE TABLE IF NOT EXISTS categories (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 4. Products Table
+-- 4. Products Table (Includes Costing, Pricing, Inventory & Deals)
 CREATE TABLE IF NOT EXISTS products (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
@@ -40,6 +44,7 @@ CREATE TABLE IF NOT EXISTS products (
   badge VARCHAR(50),
   price DECIMAL(10, 2) NOT NULL,
   original_price DECIMAL(10, 2),
+  cost_price DECIMAL(10, 2) DEFAULT 0.00, -- Merchant costing for margin calculation
   rating DECIMAL(3, 1) DEFAULT 5.0,
   rating_count INT DEFAULT 0,
   stock INT DEFAULT 50,
@@ -54,6 +59,14 @@ CREATE TABLE IF NOT EXISTS products (
   description TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- If products table already exists in Supabase, ensure cost_price column exists:
+DO $$ 
+BEGIN 
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'products' AND column_name = 'cost_price') THEN 
+    ALTER TABLE products ADD COLUMN cost_price DECIMAL(10, 2) DEFAULT 0.00; 
+  END IF; 
+END $$;
 
 -- 5. Hero Banners Table
 CREATE TABLE IF NOT EXISTS banners (
@@ -87,7 +100,7 @@ CREATE TABLE IF NOT EXISTS blogs (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 8. Orders Table
+-- 8. Orders Table (With Accept / Reject Order Tracking)
 CREATE TABLE IF NOT EXISTS orders (
   id VARCHAR(64) PRIMARY KEY,
   user_id INT REFERENCES users(id) ON DELETE SET NULL,
@@ -98,9 +111,18 @@ CREATE TABLE IF NOT EXISTS orders (
   total_amount DECIMAL(10, 2) NOT NULL,
   payment_method VARCHAR(50) DEFAULT 'razorpay',
   payment_status VARCHAR(50) DEFAULT 'pending',
-  order_status VARCHAR(50) DEFAULT 'processing',
+  order_status VARCHAR(50) DEFAULT 'pending', -- 'pending' | 'accepted' | 'rejected' | 'processing' | 'shipped' | 'delivered'
+  admin_notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- If orders table already exists in Supabase, ensure admin_notes column exists:
+DO $$ 
+BEGIN 
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'orders' AND column_name = 'admin_notes') THEN 
+    ALTER TABLE orders ADD COLUMN admin_notes TEXT; 
+  END IF; 
+END $$;
 
 -- 9. Order Items Table
 CREATE TABLE IF NOT EXISTS order_items (

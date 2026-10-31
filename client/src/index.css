@@ -1008,3 +1008,369 @@ footer {
   opacity: 0.95;
   transform: translateY(-1px);
 }
+
+
+/* ========================================================
+   macOS SEQUOIA & iOS 18 GLASSMORPHISM & MODAL DESIGN SYSTEM
+   ======================================================== */
+
+@keyframes macFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes macScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 1. Viewport Fixed Overlays (Fixes bottom document flow glitch) */
+.checkout-overlay,
+.mac-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(15, 23, 42, 0.5) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 99999 !important;
+  padding: 16px !important;
+  animation: macFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 2. macOS Window Card */
+.checkout-modal,
+.mac-window-card {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--bg-surface-elevated) !important;
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  border: 1px solid var(--border-glass) !important;
+  box-shadow: 0 24px 70px -15px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--border-subtle) !important;
+  border-radius: 24px !important;
+  animation: macScaleIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 3. macOS Titlebar & Traffic Lights */
+.mac-window-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.4);
+  user-select: none;
+}
+[data-theme="dark"] .mac-window-titlebar {
+  background: rgba(18, 24, 38, 0.45);
+}
+
+.mac-traffic-lights {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mac-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: inline-block;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.mac-dot:hover {
+  transform: scale(1.18);
+  opacity: 0.9;
+}
+.mac-dot-red { background: #ff5f56; border: 0.5px solid #e0443e; }
+.mac-dot-yellow { background: #ffbd2e; border: 0.5px solid #dea123; }
+.mac-dot-green { background: #27c93f; border: 0.5px solid #1aab29; }
+
+.mac-window-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: -0.2px;
+}
+
+/* 4. macOS Segmented Control */
+.mac-segmented-control {
+  display: flex;
+  background: rgba(142, 142, 147, 0.12);
+  padding: 3px;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+[data-theme="dark"] .mac-segmented-control {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.mac-segmented-item {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
+}
+.mac-segmented-item.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+}
+[data-theme="dark"] .mac-segmented-item.active {
+  background: rgba(255, 255, 255, 0.95);
+  color: #090d16;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+/* 5. Notification Toast - Floating Dynamic Island / Mac Notification Center */
+.notification-toast {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  left: auto !important;
+  z-index: 9999 !important;
+  background: var(--bg-surface-elevated) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border: 1px solid var(--border-glass) !important;
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--border-subtle) !important;
+  border-radius: 18px !important;
+  padding: 12px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  max-width: 360px !important;
+  animation: macScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 6. Admin Panel Glass Studio Styles */
+.admin-studio-container {
+  max-width: 1300px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+.admin-window-frame {
+  background: var(--bg-surface-elevated);
+  backdrop-filter: blur(30px) saturate(190%);
+  -webkit-backdrop-filter: blur(30px) saturate(190%);
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.12);
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.admin-nav-tabs {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 12px 18px;
+  background: rgba(142, 142, 147, 0.08);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.admin-nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.admin-nav-tab.active {
+  background: var(--bg-surface-elevated);
+  color: var(--text-main);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--border-subtle);
+}
+
+.admin-table-wrapper {
+  overflow-x: auto;
+}
+
+.mac-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.mac-table th {
+  padding: 12px 16px;
+  background: rgba(142, 142, 147, 0.06);
+  color: var(--text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mac-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.mac-table tr:hover td {
+  background: rgba(142, 142, 147, 0.04);
+}
+
+.mac-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.mac-pill-badge.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.mac-pill-badge.danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.mac-pill-badge.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.mac-pill-badge.info {
+  background: rgba(0, 113, 227, 0.15);
+  color: #0071e3;
+  border: 1px solid rgba(0, 113, 227, 0.25);
+}
+
+/* Button & Action Tokens */
+.mac-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #0071e3;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mac-btn-primary:hover {
+  background: #0077ed;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 113, 227, 0.4);
+}
+
+.mac-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(142, 142, 147, 0.12);
+  color: var(--text-main);
+  padding: 9px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mac-btn-secondary:hover {
+  background: rgba(142, 142, 147, 0.2);
+}
+
+.mac-btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mac-btn-danger:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.mac-btn-success {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mac-btn-success:hover {
+  background: #10b981;
+  color: #ffffff;
+}
