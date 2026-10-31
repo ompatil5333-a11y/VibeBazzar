@@ -1,0 +1,16 @@
+{
+  "name": "anon-ecommerce-fullstack",
+  "version": "1.0.0",
+  "description": "Anon eCommerce - Modern React SPA & Node.js/Express Backend with Supabase PostgreSQL",
+  "private": true,
+  "scripts": {
+    "start": "node server/src/server.js",
+    "server": "node server/src/server.js",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "test": "cd server && npm run test"
+  },
+  "keywords": ["react", "express", "supabase", "postgresql", "ecommerce"],
+  "author": "",
+  "license": "ISC"
+}
