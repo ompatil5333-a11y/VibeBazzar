@@ -68,9 +68,10 @@ export const createOrder = async (req, res) => {
     }
 
     const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const parsedUserId = userId && Number(userId) > 0 && Number(userId) <= 2147483647 ? parseInt(userId, 10) : null;
     const newOrder = {
       id: orderId,
-      userId: userId || null,
+      userId: parsedUserId,
       customerName,
       customerEmail,
       customerPhone: customerPhone || '',
@@ -78,7 +79,8 @@ export const createOrder = async (req, res) => {
       items,
       totalAmount: Number(totalAmount).toFixed(2),
       paymentMethod,
-      paymentStatus: paymentMethod === 'razorpay' ? 'paid' : 'pending',
+      paymentStatus: (paymentMethod === 'razorpay' || paymentMethod === 'upi') ? 'paid' : (req.body.paymentStatus || 'pending'),
+      paymentId: req.body.paymentId || (paymentMethod === 'upi' ? `UPI-TEST-${Date.now()}` : null),
       orderStatus: 'pending', // Defaults to pending until admin accepts
       adminNotes: '',
       createdAt: new Date().toISOString()

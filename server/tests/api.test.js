@@ -215,7 +215,7 @@ describe('Vibe Bazzar Fullstack: Auth, Cart, Supabase & Razorpay Suite', () => {
     assert.equal(data.success, true);
     assert.equal(data.gateway, 'razorpay');
     assert.ok(data.keyId.startsWith('rzp_test_'));
-    assert.deepEqual(data.supportedMethods, ['razorpay', 'cash_on_delivery']);
+    assert.deepEqual(data.supportedMethods, ['upi', 'razorpay', 'cash_on_delivery']);
   });
 
   test('POST /api/payment/razorpay/verify approves test mode payment signatures', async () => {
@@ -307,6 +307,45 @@ describe('Vibe Bazzar Fullstack: Auth, Cart, Supabase & Razorpay Suite', () => {
     const patchData = await patchRes.json();
     assert.equal(patchData.success, true);
     assert.equal(patchData.order.orderStatus || patchData.order.order_status, 'accepted');
+  });
+
+  test('POST /api/payment/upi/verify verifies UPI payment and records paid order in Test Mode', async () => {
+    // 1. Verify UPI ID in Test Mode
+    const upiRes = await fetch(`${baseUrl}/api/payment/upi/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        upiId: 'testuser@okhdfcbank',
+        amount: 4998.00
+      })
+    });
+    assert.equal(upiRes.status, 200);
+    const upiData = await upiRes.json();
+    assert.equal(upiData.success, true);
+    assert.ok(upiData.paymentId.startsWith('UPI-TEST-'));
+    assert.equal(upiData.upiId, 'testuser@okhdfcbank');
+
+    // 2. Record Paid UPI Order
+    const orderRes = await fetch(`${baseUrl}/api/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerName: 'UPI Test Customer',
+        customerEmail: 'upitest@example.com',
+        customerPhone: '9876543210',
+        shippingAddress: 'Indiranagar, Bengaluru 560038',
+        items: [{ id: 2, title: 'Pure Cotton Shirt', price: 1499, quantity: 1 }],
+        totalAmount: 1499.00,
+        paymentMethod: 'upi',
+        paymentStatus: 'paid',
+        paymentId: upiData.paymentId
+      })
+    });
+    assert.equal(orderRes.status, 201);
+    const orderData = await orderRes.json();
+    assert.equal(orderData.success, true);
+    assert.equal(orderData.order.paymentMethod, 'upi');
+    assert.equal(orderData.order.paymentStatus, 'paid');
   });
 
 });

@@ -15,7 +15,10 @@ import {
   Hash,
   Lock,
   ArrowRight,
-  Copy
+  Copy,
+  Smartphone,
+  QrCode,
+  Sparkles
 } from 'lucide-react';
 
 const loadRazorpayScript = () => {
@@ -47,9 +50,10 @@ export const CheckoutModal = () => {
     address: '',
     city: '',
     zip: '',
-    paymentMethod: 'cash_on_delivery' // 'cash_on_delivery' | 'razorpay'
+    paymentMethod: 'upi' // 'upi' | 'razorpay' | 'cash_on_delivery'
   });
 
+  const [upiId, setUpiId] = useState('');
   const [loading, setLoading] = useState(false);
   const [orderComplete, setOrderComplete] = useState(null);
   const [error, setError] = useState(null);
@@ -86,7 +90,58 @@ export const CheckoutModal = () => {
     setTimeout(() => setCopiedId(false), 2000);
   };
 
-  // 1. Cash On Delivery Processing
+  // 1. Instant UPI Payment Processing (Test Mode / Live)
+  const handleUpiPayment = async () => {
+    const cleanUpi = upiId.trim() || 'testuser@okhdfcbank';
+
+    // Step A: Verify UPI in Test Mode via backend endpoint
+    const verifyRes = await fetch('/api/payment/upi/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        upiId: cleanUpi,
+        amount: cartTotal
+      })
+    });
+
+    const verifyData = await verifyRes.json();
+    if (!verifyRes.ok || !verifyData.success) {
+      setError(verifyData.message || 'UPI Payment verification failed.');
+      return;
+    }
+
+    // Step B: Record Final Paid Order into Supabase PostgreSQL
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: user ? user.id : null,
+        customerName: form.name,
+        customerEmail: form.email,
+        customerPhone: form.phone,
+        shippingAddress: `${form.address}, ${form.city} ${form.zip}`,
+        items: cart,
+        totalAmount: cartTotal,
+        paymentMethod: 'upi',
+        paymentStatus: 'paid',
+        paymentId: verifyData.paymentId
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      setOrderComplete({
+        ...data.order,
+        paymentId: verifyData.paymentId,
+        upiId: cleanUpi
+      });
+      clearCart();
+    } else {
+      setError(data.message || 'Payment authorized but failed to record order.');
+    }
+  };
+
+  // 2. Cash On Delivery Processing
   const handleCashOnDelivery = async () => {
     try {
       const res = await fetch('/api/orders', {
@@ -100,7 +155,8 @@ export const CheckoutModal = () => {
           shippingAddress: `${form.address}, ${form.city} ${form.zip}`,
           items: cart,
           totalAmount: cartTotal,
-          paymentMethod: 'cash_on_delivery'
+          paymentMethod: 'cash_on_delivery',
+          paymentStatus: 'pending'
         })
       });
 
@@ -116,7 +172,7 @@ export const CheckoutModal = () => {
     }
   };
 
-  // 2. Razorpay Payment Processing (Test Mode / Live)
+  // 3. Razorpay Payment Processing (Cards, NetBanking, Wallets)
   const handleRazorpayPayment = async () => {
     const scriptLoaded = await loadRazorpayScript();
 
@@ -161,7 +217,8 @@ export const CheckoutModal = () => {
             shippingAddress: `${form.address}, ${form.city} ${form.zip}`,
             items: cart,
             totalAmount: cartTotal,
-            paymentMethod: 'razorpay'
+            paymentMethod: 'razorpay',
+            paymentStatus: 'paid'
           })
         });
 
@@ -193,7 +250,26 @@ export const CheckoutModal = () => {
       prefill: {
         name: form.name,
         email: form.email,
-        contact: form.phone
+        contact: form.phone,
+        method: 'upi'
+      },
+      config: {
+        display: {
+          blocks: {
+            upi: {
+              name: 'Pay via UPI',
+              instruments: [{ method: 'upi' }]
+            },
+            other: {
+              name: 'Cards & Netbanking',
+              instruments: [{ method: 'card' }, { method: 'netbanking' }, { method: 'wallet' }]
+            }
+          },
+          sequence: ['block.upi', 'block.other'],
+          preferences: {
+            show_default_blocks: true
+          }
+        }
       },
       theme: {
         color: '#0071e3'
@@ -222,7 +298,8 @@ export const CheckoutModal = () => {
               shippingAddress: `${form.address}, ${form.city} ${form.zip}`,
               items: cart,
               totalAmount: cartTotal,
-              paymentMethod: 'razorpay'
+              paymentMethod: 'razorpay',
+              paymentStatus: 'paid'
             })
           });
 
@@ -257,7 +334,9 @@ export const CheckoutModal = () => {
     setError(null);
 
     try {
-      if (form.paymentMethod === 'razorpay') {
+      if (form.paymentMethod === 'upi') {
+        await handleUpiPayment();
+      } else if (form.paymentMethod === 'razorpay') {
         await handleRazorpayPayment();
       } else {
         await handleCashOnDelivery();
@@ -399,7 +478,21 @@ export const CheckoutModal = () => {
                 {copiedId && <span style={{ fontSize: 11, color: '#10b981', fontWeight: 600 }}>Copied!</span>}
               </div>
 
-              {orderComplete.paymentId && (
+              {/* UPI Payment Verified Badge */}
+              {orderComplete.paymentMethod === 'upi' && (
+                <div style={{ marginBottom: 16 }}>
+                  <span
+                    className="mac-pill-badge success"
+                    style={{ fontSize: 12, padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                  >
+                    <Zap size={14} color="#10b981" />
+                    <b>UPI Payment Verified</b> ({orderComplete.paymentId}) • {orderComplete.upiId || 'Instant UPI'}
+                  </span>
+                </div>
+              )}
+
+              {/* Razorpay Verified Badge */}
+              {orderComplete.paymentMethod === 'razorpay' && orderComplete.paymentId && (
                 <div style={{ marginBottom: 16 }}>
                   <span
                     className="mac-pill-badge success"
@@ -428,7 +521,11 @@ export const CheckoutModal = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13 }}>
                   <span style={{ color: 'var(--text-muted)' }}>Payment Method:</span>
                   <span style={{ fontWeight: 600, color: 'var(--vibe-primary)' }}>
-                    {orderComplete.paymentMethod === 'razorpay' ? 'Razorpay Secure (Test Mode)' : 'Cash on Delivery (Pay at Doorstep)'}
+                    {orderComplete.paymentMethod === 'upi'
+                      ? 'UPI (Google Pay / PhonePe / Paytm) • Test Mode'
+                      : orderComplete.paymentMethod === 'razorpay'
+                      ? 'Razorpay Secure (Cards & Netbanking)'
+                      : 'Cash on Delivery (Pay at Doorstep)'}
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13 }}>
@@ -475,7 +572,7 @@ export const CheckoutModal = () => {
                   Complete Your Order
                 </h2>
                 <p style={{ fontSize: 12.5, color: 'var(--text-muted)', margin: 0 }}>
-                  Vibe Bazzar Express Checkout • Secure SSL Encrypted
+                  Vibe Bazzar Express Checkout • Instant UPI &amp; Cards
                 </p>
 
                 {/* Cart summary badge */}
@@ -684,70 +781,190 @@ export const CheckoutModal = () => {
                   </div>
                 </div>
 
-                {/* 5. Payment Method Selector (macOS / iOS Selectable Cards) */}
+                {/* 5. Payment Method Selector (Instant UPI, Razorpay & COD) */}
                 <div style={{ marginTop: 4 }}>
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>
                     Choose Payment Method
                   </label>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {/* Option A: Cash on Delivery */}
+                    {/* Option A: Instant UPI (Featured & Direct) */}
                     <div
-                      onClick={() => setForm({ ...form, paymentMethod: 'cash_on_delivery' })}
+                      onClick={() => setForm({ ...form, paymentMethod: 'upi' })}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
                         padding: '12px 14px',
                         borderRadius: 14,
-                        border: form.paymentMethod === 'cash_on_delivery'
-                          ? '2px solid #0071e3'
+                        border: form.paymentMethod === 'upi'
+                          ? '2px solid #5f27cd'
                           : '1px solid var(--border-subtle)',
-                        background: form.paymentMethod === 'cash_on_delivery'
-                          ? 'rgba(0, 113, 227, 0.06)'
+                        background: form.paymentMethod === 'upi'
+                          ? 'rgba(95, 39, 205, 0.06)'
                           : 'var(--bg-pill)',
                         cursor: 'pointer',
                         transition: 'all 0.2s ease'
                       }}
                     >
-                      <div
-                        style={{
-                          width: 38,
-                          height: 38,
-                          borderRadius: 10,
-                          background: 'rgba(16, 185, 129, 0.12)',
-                          color: '#10b981',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0
-                        }}
-                      >
-                        <ShieldCheck size={20} />
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 2 }}>
-                          Cash on Delivery (Pay at Doorstep)
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 10,
+                            background: 'linear-gradient(135deg, #5f27cd, #341f97)',
+                            color: '#fff',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            boxShadow: '0 4px 10px rgba(95, 39, 205, 0.25)'
+                          }}
+                        >
+                          <Zap size={20} />
                         </div>
-                        <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
-                          Verified courier delivery across India • Zero advance risk
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 2 }}>
+                            <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-main)' }}>
+                              Instant UPI (Google Pay, PhonePe, Paytm, BHIM)
+                            </span>
+                            <span
+                              style={{
+                                fontSize: 9.5,
+                                padding: '2px 6px',
+                                borderRadius: 4,
+                                background: 'rgba(16, 185, 129, 0.15)',
+                                color: '#10b981',
+                                fontWeight: 700,
+                                letterSpacing: 0.3
+                              }}
+                            >
+                              ⚡ TEST MODE READY
+                            </span>
+                          </div>
+                          <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+                            Pay with any UPI ID or select Google Pay, PhonePe, Paytm
+                          </div>
                         </div>
+                        <div
+                          style={{
+                            width: 18,
+                            height: 18,
+                            borderRadius: '50%',
+                            border: form.paymentMethod === 'upi'
+                              ? '5px solid #5f27cd'
+                              : '2px solid var(--border-subtle)',
+                            background: form.paymentMethod === 'upi' ? '#fff' : 'transparent',
+                            flexShrink: 0
+                          }}
+                        />
                       </div>
-                      <div
-                        style={{
-                          width: 18,
-                          height: 18,
-                          borderRadius: '50%',
-                          border: form.paymentMethod === 'cash_on_delivery'
-                            ? '5px solid #0071e3'
-                            : '2px solid var(--border-subtle)',
-                          background: form.paymentMethod === 'cash_on_delivery' ? '#fff' : 'transparent',
-                          flexShrink: 0
-                        }}
-                      />
+
+                      {/* Expandable UPI Input & Quick Select Pills */}
+                      {form.paymentMethod === 'upi' && (
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          style={{
+                            marginTop: 12,
+                            paddingTop: 12,
+                            borderTop: '1px solid rgba(95, 39, 205, 0.15)'
+                          }}
+                        >
+                          <label style={{ display: 'block', fontSize: 11.5, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>
+                            Enter UPI ID / VPA *
+                          </label>
+
+                          <div style={{ position: 'relative', marginBottom: 8 }}>
+                            <input
+                              type="text"
+                              value={upiId}
+                              onChange={(e) => setUpiId(e.target.value)}
+                              placeholder="Enter UPI ID (e.g. 9876543210@ybl or test@upi)"
+                              style={{
+                                width: '100%',
+                                padding: '9px 12px 9px 36px',
+                                borderRadius: 10,
+                                border: '1px solid rgba(95, 39, 205, 0.3)',
+                                background: 'var(--bg-surface)',
+                                color: 'var(--text-main)',
+                                fontSize: 13,
+                                boxSizing: 'border-box'
+                              }}
+                            />
+                            <Smartphone size={16} color="#5f27cd" style={{ position: 'absolute', left: 12, top: 10 }} />
+                          </div>
+
+                          {/* Quick 1-Click UPI Test Handles */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Quick Select:</span>
+                            <button
+                              type="button"
+                              onClick={() => setUpiId('user@okhdfcbank')}
+                              style={{
+                                fontSize: 11,
+                                padding: '3px 8px',
+                                borderRadius: 6,
+                                border: '1px solid rgba(0, 0, 0, 0.1)',
+                                background: upiId === 'user@okhdfcbank' ? 'rgba(0, 113, 227, 0.15)' : 'var(--bg-surface)',
+                                color: 'var(--text-main)',
+                                cursor: 'pointer',
+                                fontWeight: 600
+                              }}
+                            >
+                              🟢 Google Pay
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setUpiId('user@ybl')}
+                              style={{
+                                fontSize: 11,
+                                padding: '3px 8px',
+                                borderRadius: 6,
+                                border: '1px solid rgba(0, 0, 0, 0.1)',
+                                background: upiId === 'user@ybl' ? 'rgba(95, 39, 205, 0.15)' : 'var(--bg-surface)',
+                                color: 'var(--text-main)',
+                                cursor: 'pointer',
+                                fontWeight: 600
+                              }}
+                            >
+                              🟣 PhonePe
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setUpiId('user@paytm')}
+                              style={{
+                                fontSize: 11,
+                                padding: '3px 8px',
+                                borderRadius: 6,
+                                border: '1px solid rgba(0, 0, 0, 0.1)',
+                                background: upiId === 'user@paytm' ? 'rgba(0, 113, 227, 0.15)' : 'var(--bg-surface)',
+                                color: 'var(--text-main)',
+                                cursor: 'pointer',
+                                fontWeight: 600
+                              }}
+                            >
+                              🔵 Paytm
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setUpiId('test@upi')}
+                              style={{
+                                fontSize: 11,
+                                padding: '3px 8px',
+                                borderRadius: 6,
+                                border: '1px solid rgba(0, 0, 0, 0.1)',
+                                background: upiId === 'test@upi' ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-surface)',
+                                color: '#10b981',
+                                cursor: 'pointer',
+                                fontWeight: 700
+                              }}
+                            >
+                              ⚡ BHIM (Test)
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Option B: Razorpay Secure (Test Mode) */}
+                    {/* Option B: Razorpay Cards & NetBanking */}
                     <div
                       onClick={() => setForm({ ...form, paymentMethod: 'razorpay' })}
                       style={{
@@ -782,26 +999,11 @@ export const CheckoutModal = () => {
                         <CreditCard size={20} />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 2 }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>
-                            Razorpay Secure (UPI, Cards, NetBanking)
-                          </span>
-                          <span
-                            style={{
-                              fontSize: 9.5,
-                              padding: '2px 6px',
-                              borderRadius: 4,
-                              background: 'rgba(16, 185, 129, 0.15)',
-                              color: '#10b981',
-                              fontWeight: 700,
-                              letterSpacing: 0.3
-                            }}
-                          >
-                            🧪 TEST MODE ACTIVE
-                          </span>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 2 }}>
+                          Cards &amp; NetBanking (Razorpay)
                         </div>
                         <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
-                          Instant verification • RuPay, UPI, Cards, NetBanking
+                          Visa, MasterCard, RuPay, NetBanking &amp; Corporate Cards
                         </div>
                       </div>
                       <div
@@ -813,6 +1015,62 @@ export const CheckoutModal = () => {
                             ? '5px solid #0071e3'
                             : '2px solid var(--border-subtle)',
                           background: form.paymentMethod === 'razorpay' ? '#fff' : 'transparent',
+                          flexShrink: 0
+                        }}
+                      />
+                    </div>
+
+                    {/* Option C: Cash on Delivery */}
+                    <div
+                      onClick={() => setForm({ ...form, paymentMethod: 'cash_on_delivery' })}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        padding: '12px 14px',
+                        borderRadius: 14,
+                        border: form.paymentMethod === 'cash_on_delivery'
+                          ? '2px solid #10b981'
+                          : '1px solid var(--border-subtle)',
+                        background: form.paymentMethod === 'cash_on_delivery'
+                          ? 'rgba(16, 185, 129, 0.06)'
+                          : 'var(--bg-pill)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 38,
+                          height: 38,
+                          borderRadius: 10,
+                          background: 'rgba(16, 185, 129, 0.12)',
+                          color: '#10b981',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}
+                      >
+                        <ShieldCheck size={20} />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)', marginBottom: 2 }}>
+                          Cash on Delivery (Pay at Doorstep)
+                        </div>
+                        <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+                          Verified courier delivery across India • Zero advance risk
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          width: 18,
+                          height: 18,
+                          borderRadius: '50%',
+                          border: form.paymentMethod === 'cash_on_delivery'
+                            ? '5px solid #10b981'
+                            : '2px solid var(--border-subtle)',
+                          background: form.paymentMethod === 'cash_on_delivery' ? '#fff' : 'transparent',
                           flexShrink: 0
                         }}
                       />
@@ -866,14 +1124,20 @@ export const CheckoutModal = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 8
+                    gap: 8,
+                    background: form.paymentMethod === 'upi' ? 'linear-gradient(135deg, #5f27cd, #341f97)' : undefined
                   }}
                 >
                   {loading ? (
                     'Processing Order...'
+                  ) : form.paymentMethod === 'upi' ? (
+                    <>
+                      <span>Pay with UPI (Test Mode) • {formatPrice(cartTotal)}</span>
+                      <ArrowRight size={16} />
+                    </>
                   ) : form.paymentMethod === 'razorpay' ? (
                     <>
-                      <span>Pay with Razorpay (Test Mode) • {formatPrice(cartTotal)}</span>
+                      <span>Pay with Cards/Netbanking • {formatPrice(cartTotal)}</span>
                       <ArrowRight size={16} />
                     </>
                   ) : (

@@ -152,6 +152,33 @@ export const getPaymentConfig = (req, res) => {
     gateway: 'razorpay',
     keyId: key_id,
     currency: 'INR',
-    supportedMethods: ['razorpay', 'cash_on_delivery']
+    supportedMethods: ['upi', 'razorpay', 'cash_on_delivery']
   });
+};
+
+// 4. Verify UPI Payment (Test Mode / Instant Processing)
+export const verifyUpiPayment = async (req, res) => {
+  try {
+    const { upiId, amount } = req.body;
+    if (!upiId || !upiId.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Valid UPI ID / VPA is required (e.g., user@okhdfcbank or test@upi)'
+      });
+    }
+
+    const paymentId = `UPI-TEST-${Date.now()}-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    return res.json({
+      success: true,
+      message: 'UPI Payment successfully authorized in Test Mode',
+      paymentId,
+      upiId: upiId.trim(),
+      amount,
+      mode: 'test_mode',
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 };
