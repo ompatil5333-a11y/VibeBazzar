@@ -1812,3 +1812,435 @@ footer {
   font-size: 12.5px !important;
   color: var(--text-muted) !important;
 }
+
+
+/* Default: Hide mobile bottom navigation on desktop screens */
+.mobile-bottom-navigation {
+  display: none !important;
+}
+
+/* Fix footer address and link wrapping to prevent horizontal layout blowout */
+.footer-nav-item .content,
+.footer-nav-item address {
+  width: auto !important;
+  max-width: 100% !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
+.footer-nav-link {
+  width: auto !important;
+  max-width: 100% !important;
+  white-space: normal !important;
+}
+
+/* ========================================================
+   COMPREHENSIVE MOBILE RESPONSIVENESS & TOUCH OPTIMIZATIONS
+   ======================================================== */
+
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding-bottom: 74px !important; /* Space for fixed bottom navigation dock */
+  }
+
+  /* 1. Header on Mobile */
+  .header-top {
+    display: none !important;
+  }
+
+  .header-main {
+    padding: 8px 0 !important;
+  }
+
+  .header-main .container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 12px !important;
+    gap: 8px !important;
+  }
+
+  .vibe-brand-logo {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+  }
+
+  .vibe-brand-img {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+  }
+
+  .vibe-brand-title {
+    font-size: 17px !important;
+    letter-spacing: -0.3px !important;
+  }
+
+  .vibe-brand-subtitle {
+    font-size: 9.5px !important;
+  }
+
+  .header-search-container {
+    order: 3 !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    margin: 4px 0 0 !important;
+  }
+
+  .header-search-container .search-field {
+    padding: 8px 14px !important;
+    font-size: 13px !important;
+    border-radius: 12px !important;
+  }
+
+  .header-user-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .header-user-actions .action-btn {
+    padding: 6px !important;
+    font-size: 16px !important;
+  }
+
+  .desktop-navigation-menu {
+    display: none !important;
+  }
+
+  /* 2. Mobile Bottom Navigation Dock */
+  .mobile-bottom-navigation {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    background: var(--bg-surface-elevated) !important;
+    backdrop-filter: blur(24px) saturate(190%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+    border-top: 1px solid var(--border-glass) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08) !important;
+    display: flex !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    padding: 8px 10px !important;
+    z-index: 99999 !important;
+  }
+
+  .mobile-bottom-navigation .action-btn {
+    position: relative !important;
+    padding: 8px 12px !important;
+    border: none !important;
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    cursor: pointer !important;
+    transition: color 0.15s ease !important;
+  }
+
+  .mobile-bottom-navigation .action-btn:hover,
+  .mobile-bottom-navigation .action-btn.active {
+    color: #0071e3 !important;
+  }
+
+  /* 3. Hero Banner Mobile */
+  .banner {
+    padding: 0 10px !important;
+    margin: 8px 0 16px !important;
+  }
+
+  .banner .slider-item,
+  .banner .slider-item .banner-img {
+    min-height: 240px !important;
+    height: 240px !important;
+    border-radius: 16px !important;
+  }
+
+  .banner-content {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 10px !important;
+    top: auto !important;
+    transform: none !important;
+    max-width: calc(100% - 20px) !important;
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+  }
+
+  .banner-subtitle {
+    font-size: 11px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .banner-title {
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 4px !important;
+  }
+
+  .banner-text {
+    font-size: 11.5px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .banner-btn {
+    padding: 5px 12px !important;
+    font-size: 11.5px !important;
+  }
+
+  /* 4. Category Touch Bar Mobile */
+  .category {
+    margin-bottom: 16px !important;
+  }
+
+  .category-item-container {
+    gap: 10px !important;
+    padding: 4px 10px 8px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  .category-item-container::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .category-item {
+    min-width: 155px !important;
+    padding: 8px 12px !important;
+    border-radius: 12px !important;
+  }
+
+  /* 5. Products Container & Sidebar on Mobile */
+  .product-container .container {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 10px !important;
+  }
+
+  .sidebar {
+    display: none !important; /* Hide bulky sidebar on mobile for clean browsing */
+  }
+
+  .product-box {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  /* Minimal Products Stacking */
+  .product-minimal {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .product-minimal .product-showcase {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Deal of the Day on Mobile */
+  .product-featured {
+    margin-bottom: 20px !important;
+  }
+
+  .product-featured .showcase-container {
+    padding: 16px 12px !important;
+    border-radius: 16px !important;
+  }
+
+  .product-featured .showcase {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  .product-featured .showcase-banner {
+    width: 100% !important;
+    max-width: 240px !important;
+    margin: 0 auto !important;
+  }
+
+  .product-featured .showcase-content {
+    margin-top: 0 !important;
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  .product-featured .countdown {
+    gap: 6px !important;
+  }
+
+  .product-featured .countdown-content {
+    padding: 4px 6px !important;
+  }
+
+  .product-featured .display-number {
+    font-size: 13px !important;
+    min-width: 30px !important;
+  }
+
+  /* 6. 2-Column Responsive Product Grid on Mobile */
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .product-grid .showcase {
+    border-radius: 14px !important;
+  }
+
+  .product-grid .showcase-banner {
+    height: 165px !important;
+    min-height: 165px !important;
+    max-height: 165px !important;
+  }
+
+  .product-grid .showcase-content {
+    padding: 10px 10px 12px !important;
+  }
+
+  .product-grid .showcase-title {
+    font-size: 12px !important;
+    height: 32px !important;
+    line-height: 1.3 !important;
+    margin: 3px 0 5px !important;
+  }
+
+  .product-grid .price {
+    font-size: 13.5px !important;
+  }
+
+  .product-grid del {
+    font-size: 11px !important;
+  }
+
+  .product-grid .showcase-content button {
+    font-size: 11px !important;
+    padding: 6px 2px !important;
+  }
+
+  .showcase-actions {
+    display: none !important;
+  }
+
+  /* 7. Modals & Checkout on Mobile */
+  .mac-modal-overlay,
+  .checkout-overlay {
+    padding: 10px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow-y: auto !important;
+  }
+
+  .mac-window-card,
+  .checkout-window-card,
+  .checkout-modal {
+    max-width: 100% !important;
+    width: 100% !important;
+    border-radius: 18px !important;
+    max-height: 90vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .mac-window-titlebar {
+    padding: 10px 14px !important;
+    gap: 6px !important;
+  }
+
+  .mac-window-title {
+    font-size: 11.5px !important;
+    max-width: 180px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* 8. Cart Drawer on Mobile */
+  .cart-drawer {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    border-radius: 0 !important;
+  }
+
+  /* 9. Admin Studio Mobile */
+  .admin-studio-container {
+    padding: 0 8px !important;
+    margin: 10px auto !important;
+    width: 100% !important;
+  }
+
+  .admin-window-frame {
+    border-radius: 16px !important;
+  }
+
+  .admin-studio-container .admin-window-frame > div:nth-child(2) {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    padding: 12px 10px !important;
+  }
+
+  .admin-nav-tabs {
+    padding: 8px !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .admin-nav-tab {
+    padding: 7px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .admin-table-wrapper {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .mac-table th,
+  .mac-table td {
+    padding: 8px 10px !important;
+    font-size: 11.5px !important;
+    white-space: nowrap !important;
+  }
+
+  /* 10. Orders Page Tracking Stepper Mobile */
+  .step-label {
+    font-size: 10px !important;
+  }
+
+  .step-circle {
+    width: 26px !important;
+    height: 26px !important;
+  }
+
+  .tracking-stepper::before {
+    top: 13px !important;
+  }
+
+  .order-tracking-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  /* 11. Toast Notification Mobile */
+  .notification-toast {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 80px !important;
+    max-width: calc(100% - 24px) !important;
+    padding: 10px 14px !important;
+    border-radius: 14px !important;
+  }
+}

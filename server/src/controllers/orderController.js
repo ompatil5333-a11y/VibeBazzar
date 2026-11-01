@@ -237,11 +237,29 @@ export const updateOrderStatus = async (req, res) => {
     }
 
     // Try DB update
+    let updatedOrder = null;
     try {
-      await pool.query(
-        'UPDATE orders SET order_status = $1, admin_notes = COALESCE($2, admin_notes) WHERE id = $3',
+      const dbResult = await pool.query(
+        'UPDATE orders SET order_status = $1, admin_notes = COALESCE($2, admin_notes) WHERE id = $3 RETURNING *',
         [status, adminNotes || '', id]
       );
+      if (dbResult.rows.length > 0) {
+        const row = dbResult.rows[0];
+        updatedOrder = {
+          id: row.id,
+          userId: row.user_id,
+          customerName: row.customer_name,
+          customerEmail: row.customer_email,
+          customerPhone: row.customer_phone,
+          shippingAddress: row.shipping_address,
+          totalAmount: parseFloat(row.total_amount),
+          paymentMethod: row.payment_method,
+          paymentStatus: row.payment_status,
+          orderStatus: row.order_status,
+          adminNotes: row.admin_notes,
+          createdAt: row.created_at
+        };
+      }
     } catch (dbErr) {
       console.warn('DB error on updateOrderStatus:', dbErr.message);
     }
@@ -253,16 +271,15 @@ export const updateOrderStatus = async (req, res) => {
       if (adminNotes !== undefined) {
         fallbackOrders[orderIdx].adminNotes = adminNotes;
       }
-      return res.json({
-        success: true,
-        message: `Order #${id} status updated to ${status}`,
-        order: fallbackOrders[orderIdx]
-      });
+      if (!updatedOrder) {
+        updatedOrder = fallbackOrders[orderIdx];
+      }
     }
 
     return res.json({
       success: true,
-      message: `Order #${id} status updated to ${status}`
+      message: `Order #${id} status updated to ${status}`,
+      order: updatedOrder || { id, orderStatus: status, adminNotes }
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });

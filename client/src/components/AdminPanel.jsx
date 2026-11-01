@@ -37,8 +37,8 @@ export const AdminPanel = () => {
       return false;
     }
   });
-  const [adminUsername, setAdminUsername] = useState('admin123');
-  const [adminPassword, setAdminPassword] = useState('admin123');
+  const [adminUsername, setAdminUsername] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
   const [adminAuthError, setAdminAuthError] = useState('');
 
   const handleAdminLogin = (e) => {
@@ -49,7 +49,7 @@ export const AdminPanel = () => {
       setAdminAuthError('');
       fetchData();
     } else {
-      setAdminAuthError('Invalid credentials. Required: Username "admin123" and Password "admin123".');
+      setAdminAuthError('Invalid admin username or password. Please try again.');
     }
   };
 
@@ -428,25 +428,6 @@ WHERE table_name IN ('products', 'orders');`;
               </p>
             </div>
 
-            {/* Hint Box with required credentials */}
-            <div
-              style={{
-                background: 'rgba(0, 113, 227, 0.08)',
-                border: '1px solid rgba(0, 113, 227, 0.2)',
-                borderRadius: 12,
-                padding: '10px 14px',
-                marginBottom: 16,
-                fontSize: 12,
-                color: 'var(--text-main)'
-              }}
-            >
-              <div style={{ fontWeight: 700, color: '#0071e3', marginBottom: 2 }}>
-                🔒 Pre-configured Merchant Credentials:
-              </div>
-              <div>Username: <b style={{ fontFamily: 'monospace' }}>admin123</b></div>
-              <div>Password: <b style={{ fontFamily: 'monospace' }}>admin123</b></div>
-            </div>
-
             {adminAuthError && (
               <div
                 style={{
@@ -471,7 +452,7 @@ WHERE table_name IN ('products', 'orders');`;
                 <input
                   type="text"
                   required
-                  placeholder="admin123"
+                  placeholder=""
                   value={adminUsername}
                   onChange={(e) => setAdminUsername(e.target.value)}
                   style={{
@@ -494,7 +475,7 @@ WHERE table_name IN ('products', 'orders');`;
                 <input
                   type="password"
                   required
-                  placeholder="admin123"
+                  placeholder=""
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
                   style={{

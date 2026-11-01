@@ -265,7 +265,7 @@ export const AuthModal = () => {
                     type="text"
                     name="loginId"
                     required
-                    placeholder="Enter email or username"
+                    placeholder=""
                     value={form.loginId}
                     onChange={handleChange}
                     style={{
@@ -300,7 +300,7 @@ export const AuthModal = () => {
                     type="password"
                     name="password"
                     required
-                    placeholder="••••••••"
+                    placeholder=""
                     value={form.password}
                     onChange={handleChange}
                     style={{
@@ -409,7 +409,7 @@ export const AuthModal = () => {
                   type="password"
                   name="password"
                   required
-                  placeholder="Create strong password"
+                  placeholder=""
                   value={form.password}
                   onChange={handleChange}
                   style={{
